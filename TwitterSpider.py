@@ -64,7 +64,7 @@ def get_comments(api, tweets_data, username, since, max_size=5000, duration=1):
     :param duration: length of days to search
     :return: pandas dataframe
     """
-    since_datetime = datetime.datetime.strptime(since, '%YYYY-%MM-%DD')
+    since_datetime = datetime.datetime.strptime(since, '%Y-%m-%d')
     ids = tweets_data.loc[:, 'id']
     id_set = set(ids)
     result = []
@@ -104,9 +104,9 @@ with open(os.path.abspath(os.path.dirname(__file__)) + '/config.json', 'r') as c
     config = json.load(config_json)
 
 api = OAuth(config)
-tweets_data = get_tweets(api, screen_name='realDonaldTrump', since='2018-11-18', until='2018-11-24')
-tweets_data.to_csv('./data/Tweets.csv', index=False)
+# tweets_data = get_tweets(api, screen_name='realDonaldTrump', since='2018-11-18', until='2018-11-24')
+# tweets_data.to_csv('./data/Tweets.csv', index=False)
 
-# tweets_data = pd.read_csv('./data/Tweets.csv')
+tweets_data = pd.read_csv('./data/Tweets.csv')
 comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', duration=7)
 comments_data.to_csv('./data/Comments.csv', header=True, index=False)
