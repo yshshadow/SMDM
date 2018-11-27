@@ -23,7 +23,7 @@ def OAuth(config):
     return API(auth)
 
 
-def get_tweets(api, screen_name, since, until):
+def get_tweets(api, screen_name):
     """
     get user's timeline by api
 
@@ -33,10 +33,17 @@ def get_tweets(api, screen_name, since, until):
     :param until: until date, formatted in 'YYYY-MM-DD'
     :return: pandas dataframe
     """
-    timeline = api.user_timeline(screen_name=screen_name, tweet_mode='extended',
-                                 result_type='recent', count=100,
-                                 since=since, until=until)
-    return pd.DataFrame(tweet_filter(timeline))
+    cursor = Cursor(api.user_timeline, screen_name=screen_name, tweet_mode='extended',
+                    result_type='recent', count=100)
+
+    timeline = []
+    try:
+        for tweets in cursor.pages(200):
+            timeline.extend(tweet_filter(tweets))
+            time.sleep(1)
+    except:
+        print('meet an error')
+    return pd.DataFrame(timeline)
 
 
 def tweet_filter(statuses):
@@ -93,12 +100,12 @@ def get_comments(api, tweets_data, username, since, max_size=5000, duration=1):
                 time.sleep(0.05)
         except:
             print('meet an error')
-        temp_result = pd.DataFrame(temp_result)
         result.extend(temp_result)
         since_datetime = until_datetime
         # sleep 3 minutes after finish one search
         time.sleep(60 * 3)
     return pd.DataFrame(result)
+
 
 with open(os.path.abspath(os.path.dirname(__file__)) + '/config.json', 'r') as config_json:
     config = json.load(config_json)
@@ -108,5 +115,5 @@ api = OAuth(config)
 # tweets_data.to_csv('./data/Tweets.csv', index=False)
 
 tweets_data = pd.read_csv('./data/Tweets.csv')
-comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', duration=7)
+comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', max_size=10000, duration=7)
 comments_data.to_csv('./data/Comments.csv', header=True, index=False)
