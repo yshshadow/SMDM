@@ -3,6 +3,7 @@ import pandas as pd
 from tweepy.auth import OAuthHandler
 from tweepy.api import API
 from tweepy.cursor import Cursor
+from tweepy import TweepError
 import os
 import time
 import datetime
@@ -23,7 +24,7 @@ def OAuth(config):
     return API(auth)
 
 
-def get_tweets(api, screen_name):
+def get_tweets(api, screen_name, since, until, max_pages=200):
     """
     get user's timeline by api
 
@@ -34,15 +35,18 @@ def get_tweets(api, screen_name):
     :return: pandas dataframe
     """
     cursor = Cursor(api.user_timeline, screen_name=screen_name, tweet_mode='extended',
-                    result_type='recent', count=100)
+                    result_type='recent', count=100,
+                    since=since,
+                    until=until)
 
     timeline = []
     try:
-        for tweets in cursor.pages(200):
+        # read by pages
+        for tweets in cursor.pages(max_pages):
             timeline.extend(tweet_filter(tweets))
             time.sleep(1)
-    except:
-        print('meet an error')
+    except TweepError as e:
+        print('A Tweepy error occurred, error code is {}'.format(e.message[0]['code']))
     return pd.DataFrame(timeline)
 
 
@@ -89,17 +93,19 @@ def get_comments(api, tweets_data, username, since, max_size=5000, duration=1):
         try:
             for comment in cursor.items():
                 comment = comment._json
-                if 'media' not in comment['entities'] or comment['in_reply_to_status_id'] in id_set:
-                    temp_result.append({'id': comment['id'],
-                                        'reply_id': comment['in_reply_to_status_id'],
-                                        'user_id': comment['user']['id'],
-                                        'text': comment['full_text']})
+                if 'media' in comment['entities'] or comment['in_reply_to_status_id'] not in id_set or comment[
+                    'full_text'].startswith('RT @'):
+                    continue
+                temp_result.append({'id': comment['id'],
+                                    'reply_id': comment['in_reply_to_status_id'],
+                                    'user_id': comment['user']['id'],
+                                    'text': comment['full_text']})
                 if len(temp_result) >= max_size:
                     # when size of comments in a day is greater max_size, stop search
                     break
                 time.sleep(0.05)
-        except:
-            print('meet an error')
+        except TweepError as e:
+            print('A Tweepy error occurred, error code is {}'.format(e.message[0]['code']))
         result.extend(temp_result)
         since_datetime = until_datetime
         # sleep 3 minutes after finish one search
