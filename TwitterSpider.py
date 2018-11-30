@@ -46,8 +46,8 @@ def get_tweets(api, screen_name, since, until, max_pages=200):
             timeline.extend(tweet_filter(tweets))
             time.sleep(1)
     except TweepError as e:
-        print('A Tweepy error occurred, error code is {}'.format(e.args[0][0]['code']))
-        print(e.args[0][0]['message'])
+        print('A Tweepy error occurred')  # , error code is {}'.format(e.args[0][0]['code']))
+        # print(e.args[0][0]['message'])
     return pd.DataFrame(timeline)
 
 
@@ -106,8 +106,8 @@ def get_comments(api, tweets_data, username, since, max_size=5000, duration=1):
                     break
                 time.sleep(0.05)
         except TweepError as e:
-            print('A Tweepy error occurred, error code is {}'.format(e.args[0][0]['code']))
-            print(e.args[0][0]['message'])
+            print('A Tweepy error occurred')  # , error code is {}'.format(e.args[0][0]['code']))
+            # print(e.args[0][0]['message'])
         result.extend(temp_result)
         since_datetime = until_datetime
         # sleep 3 minutes after finish one search
@@ -123,5 +123,5 @@ api = OAuth(config)
 # tweets_data.to_csv('./data/Tweets.csv', index=False)
 
 tweets_data = pd.read_csv('./data/Tweets.csv')
-comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', max_size=10000, duration=9)
+comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', duration=9)
 comments_data.to_csv('./data/Comments.csv', header=True, index=False)
