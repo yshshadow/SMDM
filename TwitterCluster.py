@@ -11,10 +11,13 @@ import pickle
 
 
 class TwitterCluster:
-    def __init__(self, try_previous=True):
+    """
+    get k-means result of tweets data
+    """
+    def __init__(self):
         self.commons_path = './model/KMeans_commons.pickle'
         self.cluster_path = './model/KMeans_model.joblib'
-        if try_previous and os.path.isfile(self.cluster_path) and os.path.isfile(self.commons_path):
+        if os.path.isfile(self.cluster_path) and os.path.isfile(self.commons_path):
             self.cluster = joblib.load(self.cluster_path)
             with open(self.commons_path, 'rb') as f:
                 self.commons = pickle.load(f)
@@ -22,6 +25,12 @@ class TwitterCluster:
             self.cluster, self.commons = self.train_cluster()
 
     def train_cluster(self, save_model=True):
+        """
+        train k-means model
+        :param save_model: if True, save model to file
+        :return: cluster: k-means model
+                 commons: 500 common words
+        """
         train_df = self.load_training_data()
 
         # use nltk TweetTokenizer to tokenize tweets
@@ -50,6 +59,10 @@ class TwitterCluster:
         return cluster, commons
 
     def load_training_data(self):
+        """
+        load training data from csv
+        :return: training data
+        """
         # read tweets data from csv file
         df = pd.read_csv('./data/Tweets.csv', header=0)
         # change all words in tweet text to lower case
@@ -57,6 +70,12 @@ class TwitterCluster:
         return df
 
     def get_freq_dist(self, df, stop_words):
+        """
+        get frequency distribution
+        :param df: input data
+        :param stop_words: words need to be removed
+        :return: frequency distribution dictionary
+        """
         freqdist = collections.defaultdict(lambda: [])
         for i in range(len(df)):
             tokens = df.loc[i, 'tokens']
@@ -68,7 +87,12 @@ class TwitterCluster:
         return freqdist
 
     def get_matrix(self, df, commons):
-        # get vectorized matrix
+        """
+        get vectorized matrix
+        :param df: input dataframe
+        :param commons: common words
+        :return: a matrix
+        """
         array = np.zeros((len(df), len(commons)), dtype=np.int32)
         for idx, item in enumerate(commons):
             for line in item[1]:
@@ -76,6 +100,11 @@ class TwitterCluster:
         return pd.DataFrame(array, dtype=np.int32, columns=[key for key, v in commons])
 
     def most_representative(self, size=5):
+        """
+        get the representative words of clusters
+        :param size: the number of representative words
+        :return: dataframe with representative words
+        """
         representative = pd.DataFrame(index=range(0, 10), columns=range(1, size + 1))
         for index, array in enumerate(self.cluster.cluster_centers_):
             r_index = np.argsort(array)[::-1][:size]
