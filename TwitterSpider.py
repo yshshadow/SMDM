@@ -119,8 +119,8 @@ with open(os.path.abspath(os.path.dirname(__file__)) + '/config.json', 'r') as c
     config = json.load(config_json)
 
 api = OAuth(config)
-# tweets_data = get_tweets(api, screen_name='realDonaldTrump', since='2018-11-18', until='2018-11-24')
-# tweets_data.to_csv('./data/Tweets.csv', index=False)
+tweets_data = get_tweets(api, screen_name='realDonaldTrump', since='2018-11-18', until='2018-11-24')
+tweets_data.to_csv('./data/Tweets.csv', index=False)
 
 tweets_data = pd.read_csv('./data/Tweets.csv')
 comments_data = get_comments(api, tweets_data, 'realDonaldTrump', '2018-11-18', duration=9)

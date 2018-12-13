@@ -16,10 +16,20 @@ class TwitterSentimentAnalyzer:
         self.clf, self.word_features = self.load_sentiment_model()
 
     def predict(self, features):
+        """
+        predict the sentiment of a tweet
+        :param features: vector of the tweet
+        :return: type of sentiment
+        """
         result = self.clf.classify(features)
         return 'pos' if result == 4 else 'neg'
 
     def predict_df(self, text_df):
+        """
+        predict tweets in dataframe
+        :param text_df: dataframe of tweets
+        :return: result dataframe
+        """
         text_df['tokens'] = text_df.apply(lambda row: self.tknzr.tokenize(row['text']), axis=1)
         # text_df = self.tokenize(text_df)
         predict_set = [self.document_features(d, self.word_features) for i, d in text_df.iterrows()]
@@ -88,15 +98,16 @@ class TwitterSentimentAnalyzer:
         return freqdist
 
     def tokenize(self, df):
-        # tknzr = TweetTokenizer()
-        # def func(row):
-        #     self.tknzr.tokenize(row['text'])
-        #
-        # df['tokens'] = df.apply(func, axis=1)
         df['tokens'] = df.apply(lambda row: self.tknzr.tokenize(row['text']), axis=1)
         return df
 
     def document_features(self, document, word_features):
+        """
+        vectorize a tweet
+        :param document: input tweet
+        :param word_features: frequent words in training set
+        :return: vectorized features
+        """
         doc_words = set(document['tokens'])
         doc_features = {}
         for word in word_features:
@@ -106,4 +117,3 @@ class TwitterSentimentAnalyzer:
 
 # sa = TwitterSentimentAnalyzer()
 # comments = pd.read_csv('./data/Comments.csv')
-
