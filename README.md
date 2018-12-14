@@ -48,6 +48,6 @@ Sentiment 140 http://help.sentiment140.com/for-students
 ## How to use
 To collect data from Twitter, fill your Twitter API key in config.json and run TwitterSpider.py.
 
-To run clustering and sentiment analysis, remove saved models in model subfolder and run Main.ipynb.
+To run clustering and sentiment analysis by yourself, remove saved models in model subfolder and run Main.ipynb.
 
 To see the result, run Main.ipynb directly.
