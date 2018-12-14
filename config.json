@@ -1,7 +1,6 @@
 {
-  "twitter_consumer_key": "2xoa44sp2m13yZxvpFmiIcYFr",
-  "twitter_consumer_secret": "nANmcIERTnyeoEJmxmqtQnPi0IRh02YepPk9h00jqPSAWRUY1a",
-  "twitter_access_token": "181119683-MFlyvl1rKIBrxkWcOPPY7lta0to1tsLKfzvdcB4x",
-  "twitter_access_token_secret": "QLJQ4l9dCI4DJbO5ero3qw3ow9SWchF6PymbZG9h13vOl",
-  "db_connect_string":"mongodb://40.76.206.132:27017"
+  "twitter_consumer_key": "",
+  "twitter_consumer_secret": "",
+  "twitter_access_token": "",
+  "twitter_access_token_secret": "",
 }
